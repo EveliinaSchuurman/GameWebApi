@@ -1,95 +1,107 @@
-using System;
+/*using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-public class FileRepository : IRepository{
 
-    public Task<Player> Get(Guid id){
-        string jsonString;
-        jsonString = File.ReadAllText("game_dev.txt");
-        Player[] players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-         foreach(Player player in players){
-                    if(player.Id == id){
-                        return Task.FromResult(player);
-                    }
-         }
+namespace GameWebApi{
 
-        return Task.FromResult(players[0]);//yes I'm aware this returns null
+    public class PlayerList{
+        public List<Player>playerList = new List<Player>();
     }
-    public Task<Player[]> GetAll(){
-        string jsonString;
-        jsonString = File.ReadAllText(@"game_dev.txt");
-        Player[] players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-        return Task.FromResult(players);
-        }
-    public Task<Player> Create(Player player){
-        string jsonString;
-        jsonString = File.ReadAllText(@"game_dev.txt");
-        Player[] players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-        players[(players.Count()) +1] = player;
-        string jsonString2 = JsonConvert.SerializeObject(players);
-        File.WriteAllText(@"game_dev.txt", jsonString2);
-         return Task.FromResult(players[0]);
-    }
-    /*public Task<Player> Create(Player player){
-        string jsonString;
-        Player[] players;
+    public class FileRepository : IRepository{
 
-        if(new FileInfo("game_dev.txt").Length == 0)
-        {
-            jsonString = JsonConvert.SerializeObject(player);
-        } 
-        else 
-        {
-            jsonString = File.ReadAllText("game_dev.txt");
-            players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-            players.Concat(new Player[] { player }).ToArray();
-            jsonString = JsonConvert.SerializeObject(players);
+        string path = @"C:\Users\eveli\Documents\vs_code_web\GameWebApi\game_dev.txt";
+        public async Task<Player> GetPlayer(Guid id){
+            PlayerList players = await ReadFile();
+            Player newPlayer = new Player();
+            foreach(Player play in players.playerList){
+                if(play.Id == id){
+                    newPlayer = play;
+                    break;
+                }
+            }
+            return newPlayer;
         }
-        File.WriteAllText("game_dev.txt", jsonString);
-
-        Console.WriteLine(jsonString);
+        public async Task<Player[]> GetAllPlayers(){
+            PlayerList players = await ReadFile();
+            return players.playerList.ToArray();
+            }
         
-        return Task.FromResult(player);
-    }*/
-    public Task<Player> Modify(Guid id, ModifiedPlayer player){
-        string jsonString;
-        jsonString = File.ReadAllText("game_dev.txt");
-        Player[] players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-        foreach(Player _player in players){
-            if(_player.Id == id){
-                _player.Score = player.Score;
-                string jsonString2 = JsonConvert.SerializeObject(_player);
-                File.WriteAllText("game_dev.text", jsonString2);
-                        
-                return Task.FromResult(_player);
+        public async Task<Player> CreatePlayer(Player player){
+
+            PlayerList players = await ReadFile();
+            players.playerList.Add(player);
+            File.WriteAllText(path, JsonConvert.SerializeObject(players));
+            return player;
+        }
+        public async Task<Player> UpdatePlayer(Guid id, ModifiedPlayer player){
+            PlayerList players = await ReadFile();
+            Player modifiedPlayer = new Player();
+            foreach(var play in players.playerList){
+                if(play.Id == id){
+                    play.Score = player.Score;
+                    File.WriteAllText(path, JsonConvert.SerializeObject(players));
+                    break;
+                }
             }
-         }
-         return Task.FromResult(players[0]);
+            return modifiedPlayer;
+
+        }
+        public async Task<Player> DeletePlayer(Guid id){
+            PlayerList players = await ReadFile();
+            for(int i = 0; i < players.playerList.Count; i++){
+                if(players.playerList[i].Id == id){
+                    players.playerList.RemoveAt(i);
+                    File.WriteAllText(path, JsonConvert.SerializeObject(players));
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        public async Task<Item> CreateItem(Guid playerId, Item item)
+        {
+            return null;
+        }
+        public async Task<Item> GetItem(Guid playerId, Guid itemId)
+        {
+            return null;
+        }
+        public async Task<Item[]> GetAllItems(Guid playerId)
+        {
+            return null;
+        }
+        public async Task<Item> UpdateItem(Guid playerId, Item item)
+        {
+            return null;
+        }
+        public async Task<Item> DeleteItem(Guid playerId, Item item)
+        {
+            return null;
+        }
+
+
+         public async Task<PlayerList> ReadFile()
+        {
+            var players = new PlayerList();
+            string json = await File.ReadAllTextAsync(path);
+            //return JsonConvert.DeserializeObject<PlayerList>(json);
+
+            if (File.ReadAllText(path).Length != 0)
+            {
+                return JsonConvert.DeserializeObject<PlayerList>(json);
+            }
+
+            return players;
+        }
+
+        public void WriteFile(String text)
+        {
+            File.WriteAllText(path, JsonConvert.SerializeObject(text));
+        }
+
     }
-    public Task<Player> Delete(Guid id){
-        string jsonString;
-        jsonString = File.ReadAllText("game_dev.txt");
-        Player[] players = JsonConvert.DeserializeObject<Player[]>(jsonString);
-        Player[] playersnew = new Player[players.Length -1];
-        Player deletedPlayer = new Player();
-        int i = 0;
-        int j = 0;
-        while(i < players.Length){
-            if(players[i].Id != id){
-                playersnew[j] = players[i];
-                j++;
-            }
-            else {
-                players[i] = deletedPlayer;
-            }
-            i++;
-         }
-         string jsonString2 = JsonConvert.SerializeObject(playersnew);
-                File.WriteAllText("game_dev.text", jsonString2);
-         return Task.FromResult(deletedPlayer);
-    }
-}
+}*/
