@@ -20,7 +20,7 @@ namespace GameWebApi.Controllers
             _irepository = irepository;
         }
 
-        [HttpPost] //{"Name":"Tommi"}
+        [HttpPost] //{"Name":"yeet"}
         [Route("create")]
         public async Task<Item> CreateItem([FromBody] NewItem item, Guid playerId)
         {
@@ -29,6 +29,7 @@ namespace GameWebApi.Controllers
             Item new_item = new Item();
             new_item.Name = item.Name;
             new_item.Id = Guid.NewGuid();
+            [PlayerLevel]
             new_item.Level = item.Level;
             new_item.Type = item.Type;
             new_item.CreationTime = localDate;
