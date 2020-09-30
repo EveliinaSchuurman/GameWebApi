@@ -1,7 +1,14 @@
-using System.Linq;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+public enum Tag 
+        {
+            ACTIVE,
+            DEAD,
+            DONE
+        }
 
 namespace GameWebApi{
     public class Player
@@ -11,6 +18,9 @@ namespace GameWebApi{
         public int Score { get; set; }
         public int Level { get; set; }
         public bool IsBanned { get; set; }
+        
+        [EnumDataType(typeof(Tag))]
+        public Tag Tag { get; set; }
 
         public List<Item> itemList = new List<Item>();
         public DateTime CreationTime { get; set; }

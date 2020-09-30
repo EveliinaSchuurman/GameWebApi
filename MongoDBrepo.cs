@@ -53,6 +53,84 @@ namespace GameWebApi
             await _playerCollection.ReplaceOneAsync(filter, returnPlayer);
             return returnPlayer;
         }
+        //Get Players who have more than x score yritys
+        public async Task<Player[]> GetHigherLevelPlayers(int Score){
+            FilterDefinition<Player> filter = Builders<Player>.Filter.Gt("Score", Score);
+            List<Player> players = await _playerCollection.Find(filter).ToListAsync();
+            return players.ToArray();
+        }
+
+        public async Task<Player> GetPlayer(string Name)
+        {
+            var filter = Builders<Player>.Filter.Eq("Name", Name);
+            return await _playerCollection.Find(filter).FirstAsync();
+        }
+        public async Task<Player[]> GetPlayersWithTag(Tag tag){
+            var filter = Builders<Player>.Filter.Eq(player => player.Tag, tag);
+            List<Player> players = await _playerCollection.Find(filter).ToListAsync();
+            return players.ToArray();
+        }
+        public async Task<Player[]> GetPlayersWithItem(ItemType type){
+            var playersWithWeapons = Builders<Player>.Filter.ElemMatch<Item>(p => p.itemList, 
+            Builders<Item>.Filter.Eq(i => i.Type, ItemType.SWORD));
+            List<Player> players =  await _playerCollection.Find(playersWithWeapons).ToListAsync();
+            return players.ToArray();
+        }
+        public async Task<Player[]> GetPlayersWithXAmountOfItems(int size){
+            var filter = Builders<Player>.Filter.Size(p => p.itemList, size);
+            List<Player> players = await _playerCollection.Find(filter).ToListAsync();
+            return players.ToArray();
+        }
+        public async Task<UpdateResult> UpdatePlayerName(Guid id, string player)
+        {
+            /*FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, id);
+            Player returnPlayer = await _playerCollection.Find(filter).FirstAsync();
+            returnPlayer.Name = player.Name;
+            await _playerCollection.ReplaceOneAsync(filter, returnPlayer);
+            return returnPlayer;*/
+             var filter = Builders<Player>.Filter.Eq("Id", id);
+            var update = Builders<Player>.Update.Set("Name", player);
+            return await _playerCollection.UpdateOneAsync(filter, update);
+        }
+        public async Task<UpdateResult> UpdatePlayerScore(Guid id, int AddToScore){
+            FilterDefinition<Player> filter = Builders<Player>.Filter.Eq("Id", id);
+            var update = Builders<Player>.Update.Inc("Score", AddToScore);
+            return await _playerCollection.UpdateOneAsync(filter, update);
+        }
+        public async Task<UpdateResult> UpdatePlayerItemList(Guid id, Item item){
+            var filter = Builders<Player>.Filter.Eq("Id", id);
+            var update = Builders<Player>.Update.Push("itemList", item);
+            return await _playerCollection.UpdateOneAsync(filter, update);
+        }
+        public async Task<Player> SellForScore(Guid id, Guid itemId){
+            /*FilterDefinition<Player> filter = Builders<Player>.Filter.Eq(p => p.Id, id);
+            Player returnPlayer = await _playerCollection.Find(filter).FirstAsync();
+            var itemFilter = Builders<Item>.Filter.Eq(item => item.Id, itemId);
+            Player player = await _playerCollection.Find(itemFilter).FirstAsync();
+
+            for (int i = 0; i < player.itemList.Count; i++)
+            {
+                if (player.itemList[i].Id == itemId)
+                    return player.itemList[i];
+            }
+
+            return null;*/
+             var filter = Builders<Player>.Filter.Eq(p => p.Id, id);
+            var updateScore = Builders<Player>.Update.Inc("Score", 4);
+            await _playerCollection.FindOneAndUpdateAsync(filter, updateScore);
+
+            var filterItem = Builders<Player>.Filter.ElemMatch<Item>(p => p.itemList, Builders<Item>.Filter.Eq(i => i.Id, itemId));
+            return await _playerCollection.FindOneAndDeleteAsync(filterItem);
+        }
+         public async Task<Player[]> GetTop10Players()
+        {
+            var filter = Builders<Player>.Filter.Empty;
+            SortDefinition<Player> sortDef = Builders<Player>.Sort.Descending("Score");
+            List<Player> players = await _playerCollection.Find(filter).Sort(sortDef).Limit(10).ToListAsync();
+            return players.ToArray();
+        }
+
+
 
         public async Task<Item> CreateItem(Guid playerId, Item item)
         {
@@ -119,5 +197,6 @@ namespace GameWebApi
 
             return null;
         }
+        
     }
 }

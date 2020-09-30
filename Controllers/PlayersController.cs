@@ -32,6 +32,7 @@ namespace GameWebApi.Controllers
             new_player.Score = 0;
             new_player.Level = 0;
             new_player.IsBanned = false;
+            new_player.Tag = player.Tag;
             new_player.CreationTime = localDate;
 
             await _irepository.CreatePlayer(new_player);
@@ -70,6 +71,78 @@ namespace GameWebApi.Controllers
             return null;
         }
 
+        //5.1
+        [HttpGet]
+        [Route("GetHigherLeverPlayers")]
+        public async Task<Player[]>GetHigherLevelPlayers(int minScore){
+            return await _irepository.GetHigherLevelPlayers(minScore);
+        }
+        //5.2
+        [HttpGet]
+        [Route("Get/{Name:string}")]
+        public async Task<Player> GetPlayer(string Name)
+        {
+            return await _irepository.GetPlayer(Name);
+        }
+        //5.3
+        [HttpGet]
+        [Route("Get/{tag:Tag}")]
+        public async Task<Player[]> GetPlayersWithTag(Tag tag)
+        {
+            return await _irepository.GetPlayersWithTag(tag);
+        }
+        //5.4
+        [HttpGet]
+        [Route("Get/{type:Itemtype}")]
+        public async Task<Player[]> GetPlayersWithItem(ItemType type)
+        {
+            return await _irepository.GetPlayersWithItem(type);
+        }
+        //5.5
+        [HttpGet]
+        [Route("Get/{size:int}")]
+        public async Task<Player[]>GetPlayersWithXAmountOfItems(int size){
+            return await _irepository.GetPlayersWithXAmountOfItems(size);
+        }
+        //5.6
+        [HttpPost] //{"Name":Gwent}
+        [Route("Namechange/{id:Guid}")]
+        public async Task<Player> UpdatePlayerName(Guid id, [FromBody] string player)
+        {
+            await _irepository.UpdatePlayerName(id, player);
+            return null;
+        }
+        //5.7
+        [HttpPost] //{"AddToScore: 4}
+        [Route("Scorechange/{id:Guid}")]
+        public async Task<Player> UpdatePlayerScore(Guid id, [FromBody] int AddToScore)
+        {
+            await _irepository.UpdatePlayerScore(id, AddToScore);
+            return null;
+        }
+        //5.8
+        [HttpPost] //{"Item: item}
+        [Route("Scorechange/{id:Guid}")]
+        public async Task<Player> UpdatePlayerItemList(Guid id, [FromBody] Item item)
+        {
+            await _irepository.UpdatePlayerItemList(id, item);
+            return null;
+        }
+        //5.9
+        [HttpDelete]
+        [Route("{player_id:Guid}/items/{itemid:Guid}")]
+        public async Task<Player> SellForScore(Guid player_id, Guid itemid)
+        {
+            await _irepository.SellForScore(player_id, itemid);
+            return null;
+        }
+        //5.10
+        [HttpGet]
+        [Route("GetTop10Players")]
+        public async Task<Player[]> GetTop10Players()
+        {
+            return await _irepository.GetTop10Players();
+        }
 
     }
 }

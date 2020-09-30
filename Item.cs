@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
   public enum ItemType 
         {
             SWORD,
@@ -34,7 +35,8 @@ namespace GameWebApi{
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var today = DateTime.UtcNow;
+            //var today = DateTime.UtcNow;
+            var today = (DateTime)validationContext.ObjectInstance;
 
             if (today >= CreationTime)
             {

@@ -22,6 +22,7 @@ namespace GameWebApi
             {
                 e = new NotFoundException("incorrect {playerId} passed in the route");
                 context.Response.StatusCode = 404;
+                //throw new NotFoundException("404 Not Found");
             }
         }
     }
